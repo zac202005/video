@@ -1,0 +1,42 @@
+name: Generation Video Quotidienne
+
+on:
+  schedule:
+    # Attention: GitHub utilise l'heure UTC. 
+    # 11h Paris = 09h00 UTC | 16h Paris = 14h00 UTC
+    - cron: '0 9 * * *'
+    - cron: '0 14 * * *'
+  workflow_dispatch: # Permet de lancer le script manuellement pour tester
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Récupérer le code
+      uses: actions/checkout@v3
+
+    - name: Installer Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Installer ImageMagick et dépendances
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y imagemagick ffmpeg
+        # Correction des droits pour ImageMagick (sécurité)
+        sudo sed -i 's/domain="coder" rights="none" pattern="PDF"/domain="coder" rights="read|write" pattern="PDF"/' /etc/ImageMagick-6/policy.xml
+
+    - name: Installer les bibliothèques Python
+      run: |
+        pip install -r requirements.txt
+
+    - name: Exécuter le script
+      run: python mon_script.py
+
+    - name: Sauvegarder la vidéo
+      uses: actions/upload-artifact@v4
+      with:
+        name: video-du-jour
+        path: *.mp4  # Sauvegarde tous les fichiers mp4 générés
