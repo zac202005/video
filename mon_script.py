@@ -35,7 +35,3 @@ schedule.every().day.at("11:00").do(creer_video)
 schedule.every().day.at("16:00").do(creer_video)
 
 print("Programme d'automatisation lancé...")
-
-while True:
-    schedule.run_pending()
-    time.sleep(60) # Vérifie chaque minute
